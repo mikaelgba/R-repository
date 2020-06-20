@@ -48,6 +48,8 @@ hist(states[["Population"]], breaks=breaks)
 hist(states[["Murder.Rate"]], freq=FALSE )
 lines(density(states[["Murder.Rate"]]), lwd=3, col="blue")
 
+---------
+#Barra
 dfw <- read.csv('datas/03/dfw_airline.csv')
 barplot(as.matrix(dfw)/6, cex.axis = 0.8, cex.names = 0.7)
   
