@@ -1,6 +1,6 @@
 # windows utf-8
 getwd()
-setwd('G:/Projetos Programacao/R-repository/Introduction to Data Analysis with R')
+setwd('G:/Projetos Programacao/R_repository/Introduction to Data Analysis with R')
 states <- read.csv("datas/03/state.csv")
 states
 
