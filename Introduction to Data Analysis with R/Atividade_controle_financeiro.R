@@ -147,8 +147,8 @@ boxplot(canal_android[["horas_logado"]], canal_ios[["horas_logado"]],
 
 #9.a O que o resultado quer dizer?
 
-# prefiro não opniar, não porque não sei descrever o resultado, mas sim porque 
-# não sei que criei ele de forma correta
+# prefiro não opniar, não porque não sei descrever o resultado, mas por 
+# causa que não sei se criei ele da forma correta
 
 #-------------------------------------------------------------------------------  
 # 10. Utilize o gráfico violino para fazer a mesma comparação.
