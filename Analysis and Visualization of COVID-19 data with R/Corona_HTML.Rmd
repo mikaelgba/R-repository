@@ -48,3 +48,7 @@ knitr::include_graphics("grafics/02/plot_casos_acumulados_por_regiao.png")
 ```{r, echo=FALSE}
 knitr::include_graphics("grafics/02/plot_obitos_acumulados_por_regiao.png")
 ```
+
+## Codigo usado para análise
+
+- [covid_atividade_02.R](https://github.com/mikaelgba/R_repository/blob/master/Analysis%20and%20Visualization%20of%20COVID-19%20data%20with%20R/covid_atividade_02.R)

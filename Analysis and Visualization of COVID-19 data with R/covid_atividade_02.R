@@ -81,7 +81,7 @@ plot_casos_Acumulados_brasil <- ggplot(covid_brasil, aes(data, casosAcumulado)) 
   scale_x_date(expand = c(0, 0)) +
   coord_cartesian(xlim = c(lubridate::dmy("25-02-2020"),ultimo_dia)) +
   scale_fill_brewer(name = "Região", palette = "Set3") + 
-  labs(x = "Notificados", y = "Obitos") + 
+  labs(x = "Notificados", y = "Casos") + 
   ggtitle("Total de casos no Brasil")
 
 p5 <- plot_casos_Acumulados_brasil + theme_dark() + theme(legend.title = element_blank(),
