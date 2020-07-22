@@ -1,0 +1,74 @@
+---
+title: "analise exploratoria atividade"
+author: "Michael Oliveira"
+date: "21/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# instale e adicione outros pacotes que achar necessário
+library(tidyverse)
+library(here)
+library(lubridate)
+library(scales)
+
+# configurações para evitar mostrar mensagens e erros
+knitr::opts_chunk$set(error = FALSE, comment = NA, warning = FALSE, message = FALSE)
+```
+
+# Dataframe
+
+```{r}
+dados_pb <- read.csv2(here("Analysis and Visualization of COVID-19 data with R/data", "dados-pb.csv"), stringsAsFactors = TRUE, 
+                     fileEncoding = "latin1",
+                     na.strings = c("undefined", "", "null")) %>%
+  rename(id = 1) %>%
+  janitor::clean_names() %>%
+  mutate_at(vars(starts_with("data")), as_date)
+```
+
+# Questôes levantadas 
+  Que sexo apresentou mais resultados positivos, homens ou mulheres? Qual a proporção de cada um?
+
+```{r}
+sexo_casos <- dados_pb %>% group_by(sexo) %>%
+  summarise(quantidade = n()) %>% 
+  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1))
+
+glimpse(sexo_casos)
+```
+
+  Quais as 5 profissões com mais casos confirmados (resultado de teste positivo)? Quantos casos para elas?
+
+```{r}
+prof_casos <- dados_pb %>%
+  select(cbo, resultado_teste) %>%
+  filter(resultado_teste == "Positivo", cbo != "NA")
+
+glimpse(prof_casos)
+
+prof_casos <- prof_casos %>% group_by(cbo) %>%
+  summarise(quantidade = n())
+
+prof_casos[order(prof_casos$quantidade, decreasing = TRUE),]
+```
+
+  Quais os 5 municípios com mais casos confirmados (resultado de teste positivo)? Quanto casos para eles?
+
+```{r}
+muni_casos <- dados_pb %>%
+  select(municipio, resultado_teste) %>%
+  filter(resultado_teste == "Positivo")
+
+muni_casos <- muni_casos %>% group_by(municipio) %>%
+  summarise(quantidade = n())
+  
+muni_casos[order(muni_casos$quantidade, decreasing = TRUE),]
+
+```
+
+  Qual a porcentagem de crianças que testaram positivo (menor ou igual a 12 anos)? E a de idoso (maior ou igual a 60 anos)?
+
+  Quanto o tempo médio entre os primeiros sintomas e a data de teste para os diferentes tipos de teste?
+
+  Qual dia teve a maior quantidade de início de sintomas para pacientes com teste positivo?
