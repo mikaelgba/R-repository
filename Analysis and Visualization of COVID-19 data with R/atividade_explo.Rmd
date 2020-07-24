@@ -70,5 +70,24 @@ muni_casos[order(muni_casos$quantidade, decreasing = TRUE),]
   Qual a porcentagem de crianças que testaram positivo (menor ou igual a 12 anos)? E a de idoso (maior ou igual a 60 anos)?
 
   Quanto o tempo médio entre os primeiros sintomas e a data de teste para os diferentes tipos de teste?
+  
+```{r}
+temp_sint <- dados_pb %>%
+  filter(!is.na(data_inicio_sintomas) & !is.na(data_teste)) %>%
+  mutate(tempo_sintomas_teste = as.integer(data_teste - data_inicio_sintomas))
+
+glimpse(mean(temp_sint[["tempo_sintomas_teste"]]))
+```
 
   Qual dia teve a maior quantidade de início de sintomas para pacientes com teste positivo?
+
+```{r} 
+data_max <- dados_pb %>% 
+  filter(!is.na(data_inicio_sintomas)) %>%
+  group_by(data_inicio_sintomas) %>%
+  summarise(quantidade = n())
+
+data_max[order(data_max$quantidade, decreasing = TRUE),]
+```
+  
+  Qual os simtomas mais comuns entre os que tiveram resultado positivo? 

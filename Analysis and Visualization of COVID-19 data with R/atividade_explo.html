@@ -444,7 +444,34 @@ muni_casos[order(muni_casos$quantidade, decreasing = TRUE),]</code></pre>
 # ... with 213 more rows</code></pre>
 <p>Qual a porcentagem de crianças que testaram positivo (menor ou igual a 12 anos)? E a de idoso (maior ou igual a 60 anos)?</p>
 <p>Quanto o tempo médio entre os primeiros sintomas e a data de teste para os diferentes tipos de teste?</p>
+<pre class="r"><code>temp_sint &lt;- dados_pb %&gt;%
+  filter(!is.na(data_inicio_sintomas) &amp; !is.na(data_teste)) %&gt;%
+  mutate(tempo_sintomas_teste = as.integer(data_teste - data_inicio_sintomas))
+
+glimpse(mean(temp_sint[[&quot;tempo_sintomas_teste&quot;]]))</code></pre>
+<pre><code> num 10</code></pre>
 <p>Qual dia teve a maior quantidade de início de sintomas para pacientes com teste positivo?</p>
+<pre class="r"><code>data_max &lt;- dados_pb %&gt;% 
+  filter(!is.na(data_inicio_sintomas)) %&gt;%
+  group_by(data_inicio_sintomas) %&gt;%
+  summarise(quantidade = n())
+
+data_max[order(data_max$quantidade, decreasing = TRUE),]</code></pre>
+<pre><code># A tibble: 187 x 2
+   data_inicio_sintomas quantidade
+   &lt;date&gt;                    &lt;int&gt;
+ 1 2020-06-01                 6302
+ 2 2020-05-20                 5657
+ 3 2020-05-25                 5287
+ 4 2020-06-20                 5069
+ 5 2020-06-15                 5044
+ 6 2020-05-15                 4792
+ 7 2020-05-10                 4776
+ 8 2020-06-10                 4604
+ 9 2020-05-18                 4554
+10 2020-07-01                 4358
+# ... with 177 more rows</code></pre>
+<p>Qual os simtomas mais comuns entre os que tiveram resultado positivo?</p>
 </div>
 
 

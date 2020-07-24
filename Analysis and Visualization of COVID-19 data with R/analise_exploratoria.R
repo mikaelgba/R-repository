@@ -3,7 +3,7 @@ library(here)
 library(lubridate)
 library(scales)
 
-dados_pb <- read.csv2(here("Analysis and Visualization of COVID-19 data with R/data", "dados-pb.csv"), stringsAsFactors = TRUE, 
+dados_pb <- read.csv2(here("data", "dados-pb.csv"), stringsAsFactors = TRUE, 
                      fileEncoding = "latin1",
                      na.strings = c("undefined", "", "null")) %>%
   rename(id = 1) %>%
@@ -59,14 +59,18 @@ glimpse(dados_pb)
 
 # 5 
 
-temp_sint <- dados_pb %>%
-  select(data_teste, data_inicio_sintomas) %>%
-  filter(data_teste != "NA") %>%
-  filter(data_inicio_sintomas != "NA")
+#temp_sint <- dados_pb %>%
+#  filter(!is.na(data_inicio_sintomas) & !is.na(data_teste)) %>%
+#  mutate(tempo_sintomas_teste = as.integer(data_teste - data_inicio_sintomas))
 
-glimpse(temp_sint)
+#glimpse(mean(temp_sint[["tempo_sintomas_teste"]]))
 
-temp_sint <- temp_sint %>%
-  mutate(tempo_sintomas_teste = as.integer(data_teste - data_inicio_sintomas))
+# 6
 
-glimpse(mean(temp_sint[["tempo_sintomas_teste"]]))
+data_max <- dados_pb %>% 
+  filter(!is.na(data_inicio_sintomas)) %>%
+  group_by(data_inicio_sintomas) %>%
+  summarise(quantidade = n())
+
+data_max[order(data_max$quantidade, decreasing = TRUE),]
+
