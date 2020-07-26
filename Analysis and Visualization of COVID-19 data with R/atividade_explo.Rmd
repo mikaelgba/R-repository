@@ -2,8 +2,13 @@
 title: "analise exploratoria atividade"
 author: "Michael Oliveira"
 date: "21/07/2020"
-output: html_document
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
 ---
+
+## Dataframe
 
 ```{r setup, include=FALSE}
 # instale e adicione outros pacotes que achar necessário
@@ -16,8 +21,7 @@ library(scales)
 knitr::opts_chunk$set(error = FALSE, comment = NA, warning = FALSE, message = FALSE)
 ```
 
-# Dataframe
-
+Link dos dados usados: [dados-pb.csv](https://analise-de-dados-ufpb.github.io/vis-covid/data/dados-pb.csv.gz)
 ```{r}
 dados_pb <- read.csv2(here("Analysis and Visualization of COVID-19 data with R/data", "dados-pb.csv"), stringsAsFactors = TRUE, 
                      fileEncoding = "latin1",
@@ -25,10 +29,15 @@ dados_pb <- read.csv2(here("Analysis and Visualization of COVID-19 data with R/d
   rename(id = 1) %>%
   janitor::clean_names() %>%
   mutate_at(vars(starts_with("data")), as_date)
+
+glimpse(dados_pb)
 ```
 
-# Questôes levantadas 
-  Que sexo apresentou mais resultados positivos, homens ou mulheres? Qual a proporção de cada um?
+##    Levantamento 
+
+###   Questão 1
+
+Que sexo apresentou mais resultados positivos, homens ou mulheres? Qual a proporção de cada um?
 
 ```{r}
 sexo_casos <- dados_pb %>% group_by(sexo) %>%
@@ -38,22 +47,23 @@ sexo_casos <- dados_pb %>% group_by(sexo) %>%
 glimpse(sexo_casos)
 ```
 
-  Quais as 5 profissões com mais casos confirmados (resultado de teste positivo)? Quantos casos para elas?
+###   Questão 2
+
+Quais as 5 profissões com mais casos confirmados (resultado de teste positivo)? Quantos casos para elas?
 
 ```{r}
 prof_casos <- dados_pb %>%
   select(cbo, resultado_teste) %>%
-  filter(resultado_teste == "Positivo", cbo != "NA")
-
-glimpse(prof_casos)
-
-prof_casos <- prof_casos %>% group_by(cbo) %>%
+  filter(resultado_teste == "Positivo" & !is.na(cbo)) %>% 
+  group_by(cbo) %>%
   summarise(quantidade = n())
 
 prof_casos[order(prof_casos$quantidade, decreasing = TRUE),]
 ```
 
-  Quais os 5 municípios com mais casos confirmados (resultado de teste positivo)? Quanto casos para eles?
+###   Questão 3
+
+Quais os 5 municípios com mais casos confirmados (resultado de teste positivo)? Quanto casos para eles?
 
 ```{r}
 muni_casos <- dados_pb %>%
@@ -64,12 +74,36 @@ muni_casos <- muni_casos %>% group_by(municipio) %>%
   summarise(quantidade = n())
   
 muni_casos[order(muni_casos$quantidade, decreasing = TRUE),]
-
 ```
 
-  Qual a porcentagem de crianças que testaram positivo (menor ou igual a 12 anos)? E a de idoso (maior ou igual a 60 anos)?
+###   Questão 4
 
-  Quanto o tempo médio entre os primeiros sintomas e a data de teste para os diferentes tipos de teste?
+Qual a porcentagem de crianças que testaram positivo (menor ou igual a 12 anos)? E a de idoso (maior ou igual a 60 anos)?
+
+```{r}
+idade_casos <- dados_pb %>% 
+  filter(resultado_teste == "Positivo" & !is.na(idade)) %>%
+  select(idade) 
+
+idade_casos_12 <- idade_casos %>% group_by(idade <= 12) %>%
+  summarise(quantidade = n()) %>% 
+  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1)) %>%
+  select(percentual)
+
+idade_casos_60 <- idade_casos %>% group_by(idade >= 60) %>%
+  summarise(quantidade = n()) %>% 
+  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1)) %>%
+  select(percentual)
+
+print("Idade igual ou menor que 12 anos")
+glimpse(idade_casos_12[order(idade_casos_12$percentual),])
+print("Idade igual ou maior que 60 anos")
+glimpse(idade_casos_60[order(idade_casos_60$percentual),])
+```
+
+###   Questão 5
+
+Quanto o tempo médio entre os primeiros sintomas e a data de teste para os diferentes tipos de teste?
   
 ```{r}
 temp_sint <- dados_pb %>%
@@ -79,7 +113,9 @@ temp_sint <- dados_pb %>%
 glimpse(mean(temp_sint[["tempo_sintomas_teste"]]))
 ```
 
-  Qual dia teve a maior quantidade de início de sintomas para pacientes com teste positivo?
+###   Questão 6
+
+Qual dia teve a maior quantidade de início de sintomas para pacientes com teste positivo?
 
 ```{r} 
 data_max <- dados_pb %>% 
@@ -90,4 +126,19 @@ data_max <- dados_pb %>%
 data_max[order(data_max$quantidade, decreasing = TRUE),]
 ```
   
-  Qual os simtomas mais comuns entre os que tiveram resultado positivo? 
+###   Questão 7 - extra
+
+Qual os simtomas mais comuns entre os que tiveram resultado positivo? 
+
+```{r}
+sint_comuns <- dados_pb %>% filter(!is.na(sintomas) & resultado_teste == "Positivo") %>%
+  select(sintomas) %>%
+  group_by(sintomas) %>%
+  summarise(quantidade = n())
+  
+sint_comuns[order(sint_comuns$quantidade, decreasing = TRUE),]
+```
+
+## Link com os codigos no github:
+
+

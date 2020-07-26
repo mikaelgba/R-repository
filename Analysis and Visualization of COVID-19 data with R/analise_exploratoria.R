@@ -12,6 +12,7 @@ dados_pb <- read.csv2(here("data", "dados-pb.csv"), stringsAsFactors = TRUE,
 
 glimpse(dados_pb)
 
+
 # 1 
 
 #sexo_casos <- dados_pb %>% group_by(sexo) %>%
@@ -45,19 +46,27 @@ glimpse(dados_pb)
 #muni_casos[order(muni_casos$quantidade, decreasing = TRUE),]
 
 # 4
+
 #idade_casos <- dados_pb %>% 
-#  select(idade, resultado_teste) %>%
-#  filter(resultado_teste == "Positivo")
-  
-#glimpse(idade_casos)  
-  
-#idade_casos <- dados_pb %>% group_by(idade <= 12) %>%
-#  summarise(quantidade = n()) %>%
-#  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1))
+#  filter(resultado_teste == "Positivo" & !is.na(idade)) %>%
+#  select(idade) 
 
-# idade_casos
+#idade_casos_12 <- idade_casos %>% group_by(idade <= 12) %>%
+#  summarise(quantidade = n()) %>% 
+#  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1)) %>%
+#  select(percentual)
 
-# 5 
+#idade_casos_60 <- idade_casos %>% group_by(idade >= 60) %>%
+#  summarise(quantidade = n()) %>% 
+#  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1)) %>%
+#  select(percentual)
+
+#print("Idade igual ou menor que 12 anos")
+#glimpse(idade_casos_12[order(idade_casos_12$percentual),])
+#print("Idade igual ou maior que 60 anos")
+#glimpse(idade_casos_60[order(idade_casos_60$percentual),])
+  
+# 5
 
 #temp_sint <- dados_pb %>%
 #  filter(!is.na(data_inicio_sintomas) & !is.na(data_teste)) %>%
@@ -67,10 +76,18 @@ glimpse(dados_pb)
 
 # 6
 
-data_max <- dados_pb %>% 
-  filter(!is.na(data_inicio_sintomas)) %>%
-  group_by(data_inicio_sintomas) %>%
+#data_max <- dados_pb %>% 
+#  filter(!is.na(data_inicio_sintomas)) %>%
+#  group_by(data_inicio_sintomas) %>%
+#  summarise(quantidade = n())
+
+#data_max[order(data_max$quantidade, decreasing = TRUE),]
+
+# 7
+
+sint_comuns <- dados_pb %>% filter(!is.na(sintomas) & resultado_teste == "Positivo") %>%
+  select(sintomas) %>%
+  group_by(sintomas) %>%
   summarise(quantidade = n())
-
-data_max[order(data_max$quantidade, decreasing = TRUE),]
-
+  
+sint_comuns[order(sint_comuns$quantidade, decreasing = TRUE),]
