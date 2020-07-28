@@ -3,7 +3,7 @@ library(here)
 library(lubridate)
 library(scales)
 
-dados_pb <- read.csv2(here("data", "dados-pb.csv"), stringsAsFactors = TRUE, 
+dados_pb <- read.csv2(here("Analysis and Visualization of COVID-19 data with R/data", "dados-pb.csv"), stringsAsFactors = TRUE, 
                      fileEncoding = "latin1",
                      na.strings = c("undefined", "", "null")) %>%
   rename(id = 1) %>%
@@ -85,9 +85,41 @@ glimpse(dados_pb)
 
 # 7
 
-sint_comuns <- dados_pb %>% filter(!is.na(sintomas) & resultado_teste == "Positivo") %>%
-  select(sintomas) %>%
-  group_by(sintomas) %>%
-  summarise(quantidade = n())
+#sint_comuns <- dados_pb %>% filter(!is.na(sintomas) & resultado_teste == "Positivo") %>%
+#  select(sintomas) %>%
+#  group_by(sintomas) %>%
+#  summarise(quantidade = n())
   
-sint_comuns[order(sint_comuns$quantidade, decreasing = TRUE),]
+# sint_comuns[order(sint_comuns$quantidade, decreasing = TRUE),]
+
+# 8 
+
+#sint_comuns_idade_60 <- dados_pb %>% 
+#  filter(!is.na(sintomas) & resultado_teste == "Positivo" & idade >= 60) %>%
+#  group_by(sintomas) %>%
+#  summarise(quantidade = n())
+
+#sint_comuns_idade_60[order(sint_comuns_idade_60$quantidade, decreasing = TRUE),]
+
+
+# 9
+
+#cidade_inf <- dados_pb %>% 
+#  filter(!is.na(municipio) 
+#         & evolucao_caso == "Cura"
+#         & resultado_teste == "Positivo") %>%
+#  group_by(municipio) %>%
+#  summarise(quantidade = n())
+  
+#cidade_inf[order(cidade_inf$quantidade, decreasing = TRUE),]
+
+#10
+
+tipo_test <- dados_pb %>% filter(!is.na(tipo_teste)) %>%
+  group_by(tipo_teste) %>%
+  summarise(quantidade = n()) %>% 
+  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1)) %>%
+  select(tipo_teste, percentual)
+    
+tipo_test[order(tipo_test$percentual, decreasing = TRUE),] 
+    

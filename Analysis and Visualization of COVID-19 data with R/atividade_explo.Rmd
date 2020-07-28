@@ -1,5 +1,5 @@
 ---
-title: "analise exploratoria atividade"
+title: "Análise Exploratória de Dados do e-SUS - Atividade"
 author: "Michael Oliveira"
 date: "21/07/2020"
 output: 
@@ -7,6 +7,10 @@ output:
     toc: TRUE
     toc_float: TRUE
 ---
+
+## Resumo
+
+Nesta página tem como objetivo apresentar os resultados de uma atividade do Mini-curso de Análise e Visualização de dados da COVID-19, **UFPB - CAMPUS IV**, sendo tal atividade uma análise exploratória dos dados do e-SUS Notifica, sobre as notificações de suspeitos e confirmados de COVID-19 no estado da Paraiba.
 
 ## Dataframe
 
@@ -22,6 +26,7 @@ knitr::opts_chunk$set(error = FALSE, comment = NA, warning = FALSE, message = FA
 ```
 
 Link dos dados usados: [dados-pb.csv](https://analise-de-dados-ufpb.github.io/vis-covid/data/dados-pb.csv.gz)
+
 ```{r}
 dados_pb <- read.csv2(here("Analysis and Visualization of COVID-19 data with R/data", "dados-pb.csv"), stringsAsFactors = TRUE, 
                      fileEncoding = "latin1",
@@ -139,6 +144,44 @@ sint_comuns <- dados_pb %>% filter(!is.na(sintomas) & resultado_teste == "Positi
 sint_comuns[order(sint_comuns$quantidade, decreasing = TRUE),]
 ```
 
-## Link com os codigos no github:
+###   Questão 8 - extra
 
+Qual os simtomas mais comuns entre os apatir de 60 anos e os que tiveram resultado positivo?
 
+```{r}
+sint_comuns_idade_60 <- dados_pb %>% 
+  filter(!is.na(sintomas) & resultado_teste == "Positivo" & idade >= 60) %>%
+  group_by(sintomas) %>%
+  summarise(quantidade = n())
+
+sint_comuns_idade_60[order(sint_comuns_idade_60$quantidade, decreasing = TRUE),]
+```
+
+###   Questão 9 - extra
+
+Quais as 10 cidades com a maior quantidade de recuperados da COVID-19? 
+
+```{r}
+cidade_inf <- dados_pb %>% 
+  filter(!is.na(municipio) 
+         & evolucao_caso == "Cura"
+         & resultado_teste == "Positivo") %>%
+  group_by(municipio) %>%
+  summarise(quantidade = n())
+  
+cidade_inf[order(cidade_inf$quantidade, decreasing = TRUE),]
+```
+
+###   Questão 10 - extra
+
+Qual foram os tipos de testes ultilizados e suas porcentagens? 
+
+```{r}
+tipo_test <- dados_pb %>% filter(!is.na(tipo_teste)) %>%
+  group_by(tipo_teste) %>%
+  summarise(quantidade = n()) %>% 
+  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1)) %>%
+  select(tipo_teste, percentual)
+    
+tipo_test[order(tipo_test$percentual, decreasing = TRUE),]
+```
