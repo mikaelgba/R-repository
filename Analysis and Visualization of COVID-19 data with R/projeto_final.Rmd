@@ -1,0 +1,159 @@
+---
+title: "Projeto Final"
+author: "Michael Oliveira"
+date: "13/08/2020"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: menu
+    source_code: embed
+    theme: yeti
+    logo: favicon.PNG
+    vertical_layout: fill
+---
+<style type="text/css">
+.chart-title {
+   font-size: 30px;
+   font-family: Algerian;
+   text-align: center;
+}
+</style>
+
+Variação de casos e obitos {data-orientation=rows}
+=====================================  
+
+-------------------------------------
+Link do dataset: -[caso_full.csv](https://data.brasil.io/dataset/covid19/_meta/list.html)
+
+    OBS: os dados da ultima semana não indicam uma drastica redução, apenas que ainda não estão completos, já que a semana ainda não terminou.
+    
+### Variação média de novos casos por semana
+```{r setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(lubridate)
+library(scales)
+library(forcats)
+library(geobr)
+library(readr)
+library(sf)
+library(plotly)
+
+theme_plot = function(plot_entrada){
+  
+  plot_entrada + theme_dark() + theme(legend.title = element_blank(),
+                                      legend.direction = "vertical")
+}
+
+dados_br <- read.csv(here("Analysis and Visualization of COVID-19 data with R/data","caso_full.csv")) %>%
+  filter(place_type == "state") %>%
+  mutate(mes = month(date),
+         dia_da_semana = format.Date(as.Date(date), "%a"))
+```
+    
+```{r}
+dados_br_semana <- dados_br %>%
+  group_by(epidemiological_week)%>%
+  summarise(casos_acumulado = max(new_confirmed, na.rm = TRUE),
+            casos_novos_media = mean(new_confirmed, na.rm = TRUE),
+            casos_novos_total = sum(new_confirmed, na.rm = TRUE),
+            obitos_acumulado = max(new_deaths, na.rm = TRUE),
+            obitos_novos_media = mean(new_deaths, na.rm = TRUE),
+            obitos_novos_total = sum(new_deaths, na.rm = TRUE),
+            dias = n(),
+            regiao = "Brasil")
+
+
+
+dados_br_semana <- dados_br_semana %>%
+  ungroup() %>%
+  mutate(pico_casos_novos = casos_novos_media == max(casos_novos_media),
+         pico_obitos_novos = obitos_novos_media == max(obitos_novos_media))
+
+
+plot_um <- ggplot(dados_br_semana, aes(epidemiological_week, casos_novos_total,
+                                       fill = casos_novos_total, 
+                                       text = paste0(regiao, ": ",
+                                                     casos_novos_total,
+                                                     " casos"))) +
+  geom_col() +
+  scale_fill_viridis_c(option = "V") +
+  labs(x = "Semanas epidemiológicas",
+       y = "Média de casos novos semanais")
+
+ggplotly(theme_plot(plot_um), tooltip = c("text"))
+```
+   
+### Variação média de novos obitos por semana
+
+```{r}
+
+plot_dois <- ggplot(dados_br_semana, aes(epidemiological_week, obitos_novos_total,
+                                         fill = obitos_novos_total, 
+                                         text = paste0(regiao, ": ", 
+                                                       obitos_novos_total, 
+                                                       " obitos"))) +
+  geom_col() +
+  scale_fill_viridis_c(option = "V") +
+  labs(x = "Semanas epidemiológicas",
+       y = "Média de obitos por semana")
+
+ggplotly(theme_plot(plot_dois), tooltip = c("text"))
+```   
+
+Testagens PB {data-orientation=rows}
+=====================================     
+   
+Row {data-height=600}
+-------------------------------------
+
+```{r}
+
+buscar_test_cidade <- function(cidade){
+  municipio <- cidade
+  tipo_test <- dados_pb %>% filter(!is.na(tipo_teste), !is.na(municipio)) %>%
+  group_by(tipo_teste) %>%
+  summarise(quantidade = n()) %>% 
+  mutate(percentual = percent(quantidade / sum(quantidade), accuracy = 1)) %>%
+  select(tipo_teste, percentual)
+  return(tipo_test)
+}
+dados_pb <- read.csv2(here("Analysis and Visualization of COVID-19 data with R/data",
+                           "dados-pb.csv"), stringsAsFactors = TRUE, 
+                     fileEncoding = "latin1",
+                     na.strings = c("undefined", "", "null")) %>%
+  rename(id = 1) %>%
+  janitor::clean_names() %>%
+  mutate_at(vars(starts_with("data")), as_date)
+```
+
+### João Pessoa
+    
+```{r}
+test_jp <- buscar_test_cidade("João Pessoa")
+test_jp[order(test_jp$percentual, decreasing = TRUE),]
+```
+
+### Campina Grande
+    
+```{r}
+test_cg <- buscar_test_cidade("Campina Grande")
+test_cg[order(test_cg$percentual, decreasing = TRUE),]
+``` 
+
+Row
+-------------------------------------
+
+### Guarabira
+    
+```{r}
+test_gba <- buscar_test_cidade("Guarabira")
+test_gba[order(test_gba$percentual, decreasing = TRUE),]
+```
+
+### Patos
+    
+```{r}
+test_pt <- buscar_test_cidade("Patos")
+test_pt[order(test_pt$percentual, decreasing = TRUE),]
+``` 
